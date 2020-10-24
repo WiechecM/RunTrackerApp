@@ -143,7 +143,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         map = googleMap;
 
         LatLng Krakow = new LatLng(50.039269, 19.926125);
-        map.addMarker(new MarkerOptions().position(Krakow).title("Krakow"));
+
         map.moveCamera(CameraUpdateFactory.newLatLng(Krakow));
         enableMyLocation();
     }
