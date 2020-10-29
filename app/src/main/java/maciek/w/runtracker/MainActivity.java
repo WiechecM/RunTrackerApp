@@ -15,6 +15,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
@@ -29,11 +30,18 @@ import com.google.android.libraries.maps.model.MarkerOptions;
 import com.google.android.libraries.maps.model.Polyline;
 import com.google.android.libraries.maps.model.PolylineOptions;
 
+import java.util.ArrayList;
+
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback {
     public static final int REQUEST_LOCATION_PERMITION = 99;
     GoogleMap map;
     boolean start = false;
     boolean chronomWork;
+    Double prevLat;
+    Double prevLon;
+    Double totDist=0.0;
+    Double velocity;
+    private static final String TAG = "DB";
 
     private TextView textViewLatStart;
     private TextView textViewLatStop;
@@ -42,9 +50,13 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private TextView textViewDist;
     private TextView textViewTime;
     private TextView textViewVel;
+    private TextView textViewVelLabel;
+    private TextView textViewSTOP;
     private Button buttonStartStop;
-    private Double StartLat,StartLon,StopLat,StopLon;
+    private Double StartLat, StartLon, StopLat, StopLon;
     private Chronometer chronometer;
+
+    private ArrayList<DeltaDTV> intervals = new ArrayList<DeltaDTV>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,11 +71,13 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         textViewDist = (TextView) findViewById(R.id.textViewDist);
 //        textViewTime = (TextView) findViewById(R.id.textViewTime);
         textViewVel = (TextView) findViewById(R.id.textViewVel);
+        textViewVelLabel = (TextView) findViewById(R.id.textViewVelLabel);
+        textViewSTOP = (TextView) findViewById(R.id.textViewSTOP);
         buttonStartStop = (Button) findViewById(R.id.buttonStartStop);
         chronometer = (Chronometer) findViewById(R.id.chronometer);
 
 
-        final distCalc calculator = new distCalc(0.0,0.0,0.0,0.0);
+        final distCalc calculator = new distCalc(0.0, 0.0, 0.0, 0.0);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -96,43 +110,110 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
 
                 // if started take current loc as STOP and calc dist
-                if(start){
+                if (start) {
 
                     textViewLatStop.setText(String.valueOf(latitude));
                     textViewLonStop.setText(String.valueOf(longitude));
-                    StopLat=latitude;
-                    StopLon= longitude;
-                    start=!start;
+                    StopLat = latitude;
+                    StopLon = longitude;
+                    start = !start;
                     buttonStartStop.setText("START");
-                    calculator.setLoc(StartLat,StartLon,StopLat,StopLon);
-                    textViewDist.setText(String.valueOf(calculator.getDist()));
-                    Polyline line = map.addPolyline( new PolylineOptions()
-                            .add(new LatLng(StartLat,StartLon),new LatLng(StopLat,StopLon))
-                            .width(5).color(Color.RED));
+                    textViewSTOP.setText("STOP");
+                    textViewVelLabel.setText("Avr Vel: ");
+                    textViewVel.setText(String.valueOf(totDist/(SystemClock.elapsedRealtime()-chronometer.getBase())/1000));
 
                     chronometer.stop();
-                    textViewVel.setText(String.valueOf( calculator.getDist() /
-                            ((SystemClock.elapsedRealtime()-chronometer.getBase())/1000)) );
 
 
 
-                }else{ //is not started take current loc as START and start chronometer
+                } else { //is not started take current loc as START and start chronometer
 
                     textViewLatStart.setText(String.valueOf(latitude));
                     textViewLonStart.setText(String.valueOf(longitude));
-                    StartLat=latitude;
-                    StartLon= longitude;
+                    prevLat = latitude;
+                    prevLon = longitude;
+//                    StartLat=latitude;
+//                    StartLon= longitude;
                     textViewLatStop.setText("");
                     textViewLonStop.setText("");
-                    start=!start;
+                    start = !start;
                     buttonStartStop.setText("STOP");
+                    textViewSTOP.setText("CURRENT");
+                    textViewVelLabel.setText("Cur Vel: ");
 
                     chronometer.setBase(SystemClock.elapsedRealtime());
                     chronometer.start();
                     map.clear();
+
                 }
 
 
+            }
+        });
+
+        chronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+            @Override
+            public void onChronometerTick(Chronometer chronometer) {
+
+
+                if (SystemClock.elapsedRealtime() - chronometer.getBase() > 900) {
+
+                    Log.i(TAG, "Tick 1");
+                    LatLng currentLoc;
+                    distCalc delta = new distCalc(0.0, 0.0, 1.0, 1.0);
+
+                    LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                    if (ActivityCompat.checkSelfPermission(MainActivity.this,
+                            Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                            ActivityCompat.checkSelfPermission(MainActivity.this,
+                                    Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    ActivityCompat#requestPermissions
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for ActivityCompat#requestPermissions for more details.
+                        return;
+                    }
+
+
+                    Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+                    double latitude = location.getLatitude();
+                    double longitude = location.getLongitude();
+
+                    delta.setLoc(prevLat, prevLon, latitude, longitude);
+
+                    totDist = totDist + delta.getDist();
+                    textViewDist.setText(String.valueOf(totDist));
+
+
+                    intervals.add(new DeltaDTV(delta.getDist(), 1.0));
+
+                    Polyline line = map.addPolyline(new PolylineOptions()
+                            .add(new LatLng(prevLat,prevLon), new LatLng(latitude, longitude))
+                            .width(5).color(Color.RED));
+
+
+                    if (intervals.size() < 5) {
+                        Double vel = 0.0;
+                        for (DeltaDTV interv : intervals) {
+                            vel = vel + interv.getdDist();
+                        }
+                        velocity = vel / intervals.size();
+                    } else {
+
+                        Double vel = 0.0;
+                        for (int i = intervals.size() - 5; i < intervals.size() - 1; i++) {
+                            vel = vel + intervals.get(i).getdDist();
+                        }
+                        velocity = vel / 5;
+                    }
+                    textViewVel.setText(String.valueOf(velocity));
+                    prevLat = latitude;
+                    prevLon = longitude;
+                }
             }
         });
 
@@ -148,15 +229,14 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         enableMyLocation();
     }
 
-    private void enableMyLocation(){
-        if(ContextCompat.checkSelfPermission(this,
+    private void enableMyLocation() {
+        if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED){
+                == PackageManager.PERMISSION_GRANTED) {
             map.setMyLocationEnabled(true);
-        }
-        else{
-            ActivityCompat.requestPermissions(this,new String[]
-                    {Manifest.permission.ACCESS_FINE_LOCATION},
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]
+                            {Manifest.permission.ACCESS_FINE_LOCATION},
                     REQUEST_LOCATION_PERMITION);
         }
     }
@@ -165,9 +245,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
-        switch (requestCode){
+        switch (requestCode) {
             case REQUEST_LOCATION_PERMITION:
-                if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     enableMyLocation();
                     break;
                 }
