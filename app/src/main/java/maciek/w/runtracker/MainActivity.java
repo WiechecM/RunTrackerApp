@@ -2,6 +2,7 @@ package maciek.w.runtracker;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -16,9 +17,13 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.google.android.libraries.maps.CameraUpdateFactory;
@@ -29,10 +34,11 @@ import com.google.android.libraries.maps.model.LatLng;
 import com.google.android.libraries.maps.model.MarkerOptions;
 import com.google.android.libraries.maps.model.Polyline;
 import com.google.android.libraries.maps.model.PolylineOptions;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 
-public class MainActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     public static final int REQUEST_LOCATION_PERMITION = 99;
     GoogleMap map;
     boolean start = false;
@@ -43,20 +49,28 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     Double velocity;
     private static final String TAG = "DB";
 
-    private TextView textViewLatStart;
-    private TextView textViewLatStop;
-    private TextView textViewLonStart;
-    private TextView textViewLonStop;
     private TextView textViewDist;
-    private TextView textViewTime;
     private TextView textViewVel;
     private TextView textViewVelLabel;
-    private TextView textViewSTOP;
-    private Button buttonStartStop;
+    private ImageButton buttonStartStop;
     private Double StartLat, StartLon, StopLat, StopLon;
     private Chronometer chronometer;
+    private Toolbar toolbar;
+    private BottomNavigationView bottomNavigationView;
 
     private ArrayList<DeltaDTV> intervals = new ArrayList<DeltaDTV>();
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_toolbar,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,17 +78,46 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_main);
         //enableMyLocation();
 
-        textViewLatStart = (TextView) findViewById(R.id.textViewLatStart);
-        textViewLatStop = (TextView) findViewById(R.id.textViewLatStop);
-        textViewLonStart = (TextView) findViewById(R.id.textViewLonStart);
-        textViewLonStop = (TextView) findViewById(R.id.textViewLonStop);
         textViewDist = (TextView) findViewById(R.id.textViewDist);
 //        textViewTime = (TextView) findViewById(R.id.textViewTime);
         textViewVel = (TextView) findViewById(R.id.textViewVel);
         textViewVelLabel = (TextView) findViewById(R.id.textViewVelLabel);
-        textViewSTOP = (TextView) findViewById(R.id.textViewSTOP);
-        buttonStartStop = (Button) findViewById(R.id.buttonStartStop);
+        buttonStartStop = (ImageButton) findViewById(R.id.buttonStartStop);
         chronometer = (Chronometer) findViewById(R.id.chronometer);
+
+        //toolbar
+        toolbar = (Toolbar) findViewById(R.id.toolbar_view);
+        setSupportActionBar(toolbar);
+        toolbar.setOverflowIcon(getDrawable(R.drawable.ic_menu));
+
+        //navigation bar
+        bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setSelectedItemId(R.id.training);
+
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId()){
+                    case R.id.friends:
+                        startActivity(new Intent(getApplicationContext(), FriendsActivity.class));
+                        overridePendingTransition(0,0);
+                        return true;
+                    case R.id.training:
+                        return true;
+                    case R.id.history:
+                        startActivity(new Intent(getApplicationContext(), HistoryActivity.class));
+                        overridePendingTransition(0,0);
+                        return true;
+                    case R.id.statistics:
+                        startActivity(new Intent(getApplicationContext(), StatisticActivity.class));
+                        overridePendingTransition(0,0);
+                        return true;
+                }
+                return false;
+            }
+        });
+
+
 
 
         final distCalc calculator = new distCalc(0.0, 0.0, 0.0, 0.0);
@@ -83,6 +126,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
 
+
+        // start button listener
         buttonStartStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,39 +157,34 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 // if started take current loc as STOP and calc dist
                 if (start) {
 
-                    textViewLatStop.setText(String.valueOf(latitude));
-                    textViewLonStop.setText(String.valueOf(longitude));
                     StopLat = latitude;
                     StopLon = longitude;
                     start = !start;
-                    buttonStartStop.setText("START");
-                    textViewSTOP.setText("STOP");
+                    buttonStartStop.setBackground(getDrawable(R.drawable.ic_play));
                     textViewVelLabel.setText("Avr Vel: ");
                     textViewVel.setText(String.valueOf(totDist/(SystemClock.elapsedRealtime()-chronometer.getBase())/1000));
 
                     chronometer.stop();
-
-
+                    for (int i = 0; i < bottomNavigationView.getMenu().size(); i++) {
+                        bottomNavigationView.getMenu().getItem(i).setEnabled(true);
+                    }
 
                 } else { //is not started take current loc as START and start chronometer
 
-                    textViewLatStart.setText(String.valueOf(latitude));
-                    textViewLonStart.setText(String.valueOf(longitude));
+
                     prevLat = latitude;
                     prevLon = longitude;
-//                    StartLat=latitude;
-//                    StartLon= longitude;
-                    textViewLatStop.setText("");
-                    textViewLonStop.setText("");
                     start = !start;
-                    buttonStartStop.setText("STOP");
-                    textViewSTOP.setText("CURRENT");
+                    buttonStartStop.setBackground(getDrawable(R.drawable.ic_stop));
                     textViewVelLabel.setText("Cur Vel: ");
 
                     chronometer.setBase(SystemClock.elapsedRealtime());
                     chronometer.start();
                     map.clear();
 
+                    for (int i = 0; i < bottomNavigationView.getMenu().size(); i++) {
+                        bottomNavigationView.getMenu().getItem(i).setEnabled(false);
+                    }
                 }
 
 
@@ -245,6 +285,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case REQUEST_LOCATION_PERMITION:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {

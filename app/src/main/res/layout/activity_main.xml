@@ -1,248 +1,166 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:orientation="vertical"
-    android:weightSum="4">
+    tools:context=".MainActivity">
 
+    <include
+        layout="@layout/toolbar"
+        android:id="@+id/toolbar_view"/>
 
     <fragment
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         android:id="@+id/map"
         class="com.google.android.libraries.maps.SupportMapFragment"
-        android:layout_weight="2"   />
+        android:layout_above="@id/buttonStartStop"
+        android:layout_below="@id/toolbar_view"/>
 
-    <LinearLayout
+
+   <ImageButton
+        android:id="@+id/buttonStartStop"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:background="@drawable/ic_play"
+        android:layout_above="@id/bottom_navigation"
+        android:layout_centerHorizontal="true"/>
+
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:orientation="vertical"
-        android:layout_weight="1"
-        android:weightSum="3">
+        android:layout_above="@id/bottom_navigation"
+        android:layout_alignTop="@+id/buttonStartStop"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@id/buttonStartStop">
 
 
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:orientation="horizontal"
-            android:layout_weight="1"
-            android:weightSum="2">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:text="START"
-                android:textSize="30sp"
-                android:gravity="center"
-                android:id="@+id/textViewStart"
-                android:layout_weight="1"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:text="CURRENT"
-                android:textSize="30sp"
-                android:gravity="center"
-                android:id="@+id/textViewSTOP"
-                android:layout_weight="1"/>
-
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:orientation="horizontal"
-            android:layout_weight="1"
-            android:weightSum="8">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:text="lat: "
-                android:textSize="25sp"
-                android:gravity="center"
-                android:layout_weight="1"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:id="@+id/textViewLatStart"
-                android:textSize="30sp"
-                android:gravity="center"
-                android:layout_weight="3"
-                android:maxLines="1"
-                android:maxLength="10" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:text="lat: "
-                android:textSize="25sp"
-                android:gravity="center"
-                android:layout_weight="1"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:id="@+id/textViewLatStop"
-                android:textSize="30sp"
-                android:gravity="center"
-                android:layout_weight="3"
-                android:maxLines="1"
-                android:maxLength="10" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:orientation="horizontal"
-            android:layout_weight="1"
-            android:weightSum="8">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:text="lon: "
-                android:textSize="25sp"
-                android:gravity="center"
-                android:layout_weight="1"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:id="@+id/textViewLonStart"
-                android:textSize="30sp"
-                android:gravity="center"
-                android:layout_weight="3"
-                android:maxLines="1"
-                android:maxLength="10" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:text="lon: "
-                android:textSize="25sp"
-                android:gravity="center"
-                android:layout_weight="1"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:id="@+id/textViewLonStop"
-                android:textSize="30sp"
-                android:gravity="center"
-                android:layout_weight="3"
-                android:maxLines="1"
-                android:maxLength="10" />
-
-        </LinearLayout>
-
-
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical">
-
-
-        <LinearLayout
-
-            android:id="@+id/linearLayout"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="horizontal"
-            android:paddingHorizontal="70dp"
-            android:weightSum="4">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="Dist: "
-                android:textSize="25sp" />
-
-            <TextView
-                android:id="@+id/textViewDist"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="3"
-                android:gravity="center"
-                android:maxLength="10"
-                android:maxLines="1"
-                android:textSize="30sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-
-            android:id="@+id/linearLayout_time"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="horizontal"
-            android:weightSum="10">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:gravity="center"
-                android:text="Time"
-                android:textSize="25sp" />
-
-            <Chronometer
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:id="@+id/chronometer"
-                android:layout_weight="4"
-                android:textSize="30sp"
-                android:gravity="center"
-                />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:id="@+id/textViewVelLabel"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="Cur Vel: "
-                android:textSize="25sp" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="3"
-                android:gravity="center"
-                android:textSize="30sp"
-                android:id="@+id/textViewVel"
-                android:maxLines="1"
-                android:maxLength="10" />
-
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/buttonStartStop"
+        <Chronometer
+            android:id="@+id/chronometer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="START"
-            android:textSize="30sp"
-            android:layout_gravity="center"
-            />
+            android:textSize="35sp"
+            android:layout_centerInParent="true"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Time"
+            android:textColor="@color/qu_grey_600"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/chronometer"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_above="@id/bottom_navigation"
+        android:layout_alignTop="@+id/buttonStartStop"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@id/buttonStartStop">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:id="@+id/RalativeViewLine"
+            android:layout_centerVertical="true"/>
+
+        <TextView
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/distLabel"
+            android:text="Dist:"
+            android:textColor="@color/qu_grey_600"
+            android:layout_alignParentStart="true"
+            android:layout_above="@id/RalativeViewLine"
+            android:layout_alignTop="@id/textViewDist"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/textViewDist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:maxLines="1"
+            android:maxLength="6"
+            android:textSize="25sp"
+            android:textColor="@color/Black"
+            android:layout_centerHorizontal="true"
+            android:layout_toRightOf="@id/distLabel"
+            android:layout_toLeftOf="@id/textViewDistUnits"
+            android:layout_above="@id/RalativeViewLine"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/textViewDistUnits"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" km"
+            android:textSize="25sp"
+            android:textColor="@color/Black"
+            android:layout_centerHorizontal="true"
+            android:layout_above="@id/RalativeViewLine"
+            android:layout_alignParentRight="true"
+            android:gravity="center"/>
+
+        <TextView
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/textViewVelLabel"
+            android:text="Vel:"
+            android:textColor="@color/qu_grey_600"
+            android:layout_below="@id/RalativeViewLine"
+            android:layout_alignBottom="@id/textViewVel"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/textViewVel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:maxLines="1"
+            android:maxLength="6"
+            android:textSize="25sp"
+            android:textColor="@color/Black"
+            android:layout_centerHorizontal="true"
+            android:layout_toEndOf="@id/distLabel"
+            android:layout_toStartOf="@id/textViewDistUnits"
+            android:layout_below="@id/RalativeViewLine"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/textViewVelUnits"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/RalativeViewLine"
+            android:layout_alignParentEnd="true"
+            android:gravity="center"
+            android:text=" km/h"
+            android:textColor="@color/Black"
+            android:textSize="25sp" />
 
 
-    </LinearLayout>
+
+    </RelativeLayout>
 
 
-</LinearLayout>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/bottom_navigation"
+        android:background="@color/colorPrimary"
+        app:itemBackground="@color/colorPrimary"
+        app:itemTextColor="@drawable/selector"
+        app:itemIconTint="@drawable/selector"
+        app:menu="@menu/menu_navigation"
+        android:layout_alignParentBottom="true"
+        />
+
+
+</RelativeLayout>
 
