@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LoginActivity">
+
+    <include
+        layout="@layout/toolbar"
+        android:id="@+id/toolbar_view"/>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/loginForm"
+        android:text="Login Form"
+        android:textSize="35sp"
+        android:padding="10dp"
+        android:gravity="center"
+        android:layout_below="@id/toolbar_view"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/EditTextUserName"
+        android:layout_below="@id/loginForm"
+        android:textSize="35sp"
+        android:hint="Username"
+        android:gravity="center"
+        android:padding="10dp"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/EditTextPassword"
+        android:layout_below="@id/EditTextUserName"
+        android:textSize="35sp"
+        android:hint="Password"
+        android:gravity="center"
+        android:padding="10dp"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttonLogin"
+        android:text="LOGIN"
+        android:layout_below="@id/EditTextPassword"
+        android:textSize="35sp"
+        android:padding="10dp"/>
+
+
+</RelativeLayout>

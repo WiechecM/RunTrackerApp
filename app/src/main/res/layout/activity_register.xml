@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RegisterActivity">
+
+
+    <include
+        layout="@layout/toolbar"
+        android:id="@+id/toolbar_view"/>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/registerForm"
+        android:text="Register Form"
+        android:textSize="35sp"
+        android:padding="10dp"
+        android:gravity="center"
+        android:layout_below="@id/toolbar_view"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/EditTextName"
+        android:maxLines="1"
+        android:layout_below="@id/registerForm"
+        android:textSize="35sp"
+        android:hint="Name"
+        android:gravity="center"
+        android:padding="10dp"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/EditTextSurname"
+        android:maxLines="1"
+        android:layout_below="@id/EditTextName"
+        android:textSize="35sp"
+        android:hint="Surname"
+        android:gravity="center"
+        android:padding="10dp"/>
+
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/EditTextEmail"
+        android:maxLines="1"
+        android:layout_below="@id/EditTextSurname"
+        android:textSize="35sp"
+        android:hint="E-mail"
+        android:gravity="center"
+        android:padding="10dp"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/EditTextUserNameRegister"
+        android:maxLines="1"
+        android:layout_below="@id/EditTextEmail"
+        android:textSize="35sp"
+        android:hint="Username"
+        android:gravity="center"
+        android:padding="10dp"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/EditTextPasswordRegister"
+        android:maxLines="1"
+        android:inputType="textPassword"
+        android:layout_below="@id/EditTextUserNameRegister"
+        android:textSize="35sp"
+        android:hint="Password"
+        android:gravity="center"
+        android:padding="10dp"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/EditTextRepeatPassword"
+        android:maxLines="1"
+        android:inputType="textPassword"
+        android:layout_below="@id/EditTextPasswordRegister"
+        android:textSize="35sp"
+        android:hint="Repeat Password"
+        android:gravity="center"
+        android:padding="10dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/EditTextRepeatPassword">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/buttonRegister"
+            android:text="REGISTER"
+            android:textSize="35sp"
+            android:padding="10dp"
+            android:layout_margin="10dp"
+            android:layout_weight="1"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/buttonCancel"
+            android:text="CANCEL"
+            android:textSize="35sp"
+            android:padding="10dp"
+            android:layout_margin="10dp"
+            android:layout_weight="1"/>
+
+
+    </LinearLayout>
+
+
+
+</RelativeLayout>

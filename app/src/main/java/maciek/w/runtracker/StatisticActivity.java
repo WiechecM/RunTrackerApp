@@ -18,6 +18,12 @@ public class StatisticActivity extends AppCompatActivity {
     private Toolbar toolbar;
 
     @Override
+    public void onBackPressed() {
+        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+        overridePendingTransition(0,0);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statistic);

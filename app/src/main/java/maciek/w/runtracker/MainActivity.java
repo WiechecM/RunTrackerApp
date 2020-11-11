@@ -15,6 +15,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.Menu;
@@ -25,6 +26,7 @@ import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.libraries.maps.CameraUpdateFactory;
 import com.google.android.libraries.maps.GoogleMap;
@@ -49,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     Double velocity;
     private static final String TAG = "DB";
 
+
     private TextView textViewDist;
     private TextView textViewVel;
     private TextView textViewVelLabel;
@@ -60,6 +63,29 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private ArrayList<DeltaDTV> intervals = new ArrayList<DeltaDTV>();
 
+
+    //double tap back button to exit the app
+    boolean doubleBackToExitPressedOnce = false;
+
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            finish();
+            System.exit(0);
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce=false;
+            }
+        }, 2000);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -69,7 +95,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        return super.onOptionsItemSelected(item);
+        switch (item.getItemId()){
+            case R.id.log_in:
+                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                overridePendingTransition(0,0);
+                return true;
+
+            case R.id.sign_up:
+                startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
+                overridePendingTransition(0,0);
+                return true;
+        }
+        return false;
     }
 
     @Override
@@ -165,6 +202,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     textViewVel.setText(String.valueOf(totDist/(SystemClock.elapsedRealtime()-chronometer.getBase())/1000));
 
                     chronometer.stop();
+                    // enable the navigation bar
                     for (int i = 0; i < bottomNavigationView.getMenu().size(); i++) {
                         bottomNavigationView.getMenu().getItem(i).setEnabled(true);
                     }
@@ -182,9 +220,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     chronometer.start();
                     map.clear();
 
+                    //disable the navigation bar
                     for (int i = 0; i < bottomNavigationView.getMenu().size(); i++) {
                         bottomNavigationView.getMenu().getItem(i).setEnabled(false);
                     }
+
+                    //disable the toolbar
+
                 }
 
 
