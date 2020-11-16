@@ -64,6 +64,7 @@
         android:layout_below="@id/EditTextEmail"
         android:textSize="35sp"
         android:hint="Username"
+
         android:gravity="center"
         android:padding="10dp"/>
 

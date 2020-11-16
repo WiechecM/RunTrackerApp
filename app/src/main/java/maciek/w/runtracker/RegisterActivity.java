@@ -5,6 +5,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -85,6 +86,10 @@ public class RegisterActivity extends AppCompatActivity {
 
                 //create user
                 if(isPasswordCorrect && isUsernameCorrect){
+                    SharedPreferences sharedPreferences = getSharedPreferences(
+                            getResources().getString(R.string.SHARED_PREFS),MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+
                     ContentValues contentValues = new ContentValues();
                     contentValues.put("name",name);
                     contentValues.put("surname",surname);
@@ -92,8 +97,21 @@ public class RegisterActivity extends AppCompatActivity {
                     contentValues.put("username",userName);
                     contentValues.put("password",password);
 
+                    String dbUnits;
+                    if (sharedPreferences.getBoolean("units",false))
+                        dbUnits="Imperial";
+                    else dbUnits="Metric";
+                    contentValues.put("units",dbUnits);
+                    contentValues.put("interval",sharedPreferences.getInt("Intervals",3));
+
+                    //creating the user
                     dataBaseHalper.createUser(contentValues);
                     Toast.makeText(RegisterActivity.this, "User registered", Toast.LENGTH_SHORT).show();
+
+                    //saving the user id
+                    editor.putInt("userId",dataBaseHalper.getUserID(userName));
+                    editor.apply();
+
                 }
 
             }

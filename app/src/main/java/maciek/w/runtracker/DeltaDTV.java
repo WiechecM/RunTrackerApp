@@ -8,23 +8,44 @@ class DeltaDTV {
     private Double dTime;
     private Double dVel;
 
-    public DeltaDTV(Double _dist, Double _time){
-        this.dDist=_dist;
-        this.dTime=_time;
+    public DeltaDTV(Double _dist, Double _time) {
+        this.dDist = _dist;
+        this.dTime = _time;
         calcVel();
+        roundValues(4.0);
     }
 
-    private void calcVel(){
-        this.dVel=this.dDist/this.dTime;
+    private void calcVel() {
+        this.dVel = this.dDist / this.dTime;
     }
 
-    public Double getdDist(){
+    public Double getdDist() {
         return this.dDist;
     }
-    public Double getdTime(){
+
+    public Double getdTime() {
         return this.dTime;
     }
-    public Double getdVel(){
+
+    public Double getdVel() {
         return this.dVel;
+    }
+
+    private void roundValues(double decimal) {
+        double temp = Math.pow(10.0,decimal);
+        this.dDist=Math.round(dDist*temp)/temp;
+        this.dVel=Math.round(dVel*temp)/temp;
+    }
+
+    public String dTimeToString(){
+        return String.valueOf(dTime);
+    }
+
+    public String dDistToString(){
+        return String.valueOf(dDist);
+    }
+
+    public String dVelToString(){
+        return String.valueOf(dVel);
     }
 }

@@ -14,9 +14,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".SettingsActivity"
+            android:parentActivityName=".MainActivity"/>
+        <activity
             android:name=".RegisterActivity"
             android:parentActivityName=".MainActivity" />
-
         <activity
             android:name=".LoginActivity"
             android:parentActivityName=".MainActivity" />
