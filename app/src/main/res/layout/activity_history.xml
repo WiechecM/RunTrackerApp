@@ -11,13 +11,13 @@
         layout="@layout/toolbar"
         android:id="@+id/toolbar_view"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="History"
-        android:textSize="35sp"
-        android:layout_centerInParent="true"/>
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/history_recycler_view"
+        android:layout_below="@id/toolbar_view"
+        android:layout_above="@id/bottom_navigation"/>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
 

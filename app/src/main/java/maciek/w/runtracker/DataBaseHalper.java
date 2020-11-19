@@ -2,6 +2,7 @@ package maciek.w.runtracker;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
@@ -119,6 +120,19 @@ class DataBaseHalper extends SQLiteOpenHelper {
             return false;
         }
 
+    }
+
+    public Cursor readTrainingList(int id){
+
+        String query = "SELECT date,tot_dist,tot_time,id FROM trainings where id_user = "+id;
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = null;
+
+        if (db!=null && id>0){
+            cursor=db.rawQuery(query,null);
+
+        }
+        return cursor;
     }
 
     @Override
