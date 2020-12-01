@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="15dp">
+
+    <TextView
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewMidtimeDist"
+        android:text="100m"
+        android:layout_marginHorizontal="5dp"
+        android:gravity="center_horizontal"
+        android:textColor="@color/Black"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginHorizontal="5dp"
+        android:layout_marginBottom="10dp">
+
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/textViewMidtimeVal"
+            android:text="0:00:00"
+            android:textSize="30dp"
+            android:textColor="@color/Black"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingHorizontal="5dp">
+
+
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:background="@drawable/progress_view_background"
+                android:layout_centerVertical="true"/>
+
+            <View
+                android:layout_width="100dp"
+                android:layout_height="10dp"
+                android:background="@drawable/progress_view_red"
+                android:id="@+id/viewMidTimeProgressBar"
+                android:layout_centerVertical="true" />
+
+
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

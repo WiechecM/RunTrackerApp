@@ -92,19 +92,71 @@ public class HistoryActivity extends AppCompatActivity {
         storeDataInArrays();
 
 
-        //temporarty data
-        dates= new String[]{"2020.01.01 18.00", "2020.01.02 17.00","2020.01.04 11.05"};
-        descriptions = new String[]{"2.4km in 3m34s","2.6km in 3m56s","2.9km in 4m"};
-
         RVAdapter rvAdapter = new RVAdapter(this,dates_al,descriptions_al,trainingID);
         recyclerView.setAdapter(rvAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
     }
 
+    //options menu
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        sharedPreferences = getSharedPreferences(
+                getResources().getString(R.string.SHARED_PREFS),MODE_PRIVATE);
+        MenuInflater inflater = getMenuInflater();
+        // if id==1, no user is looged (default offline user)
+        if (sharedPreferences.getInt("userId",1)==1) {
+            inflater.inflate(R.menu.menu_toolbar,menu);
+        }
+        // if user is logged display second manu with logout
+        else{
+            inflater.inflate(R.menu.menu_toolbar_2,menu);
+        }
+        return super.onCreateOptionsMenu(menu);
+    }
+
+
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.log_in:
+                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                overridePendingTransition(0,0);
+                return true;
+
+            case R.id.settings:
+                startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
+                overridePendingTransition(0,0);
+                return true;
+
+            case R.id.sign_up:
+                startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
+                overridePendingTransition(0,0);
+                return true;
+
+            case R.id.log_out:
+                logOut();
+                return true;
+        }
+        return false;
+    }
+
+    private void logOut(){
+        sharedPreferences = getSharedPreferences(
+                getResources().getString(R.string.SHARED_PREFS),MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putInt("userId",1);
+        editor.apply();
+
+        //redraw the menu
+        this.invalidateOptionsMenu();
+    }
+
     void storeDataInArrays(){
         Cursor cursor = dataBaseHalper.readTrainingList(sharedPreferences.getInt("userId",0));
-       //DatabaseUtils.dumpCursorToString(cursor);
+       DatabaseUtils.dumpCursorToString(cursor);
         if (cursor.getCount()==0){
             Toast.makeText(this, "There is no trainings to display", Toast.LENGTH_SHORT).show();
         }else {
@@ -117,19 +169,6 @@ public class HistoryActivity extends AppCompatActivity {
                 trainingID.add(cursor.getInt(3));
             }
         }
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_toolbar,menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        return super.onOptionsItemSelected(item);
     }
 
 }

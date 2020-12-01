@@ -15,25 +15,37 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".TrainingViewer"
-            android:parentActivityName=".HistoryActivity"/>
+            android:parentActivityName=".HistoryActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".SettingsActivity"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".RegisterActivity"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".LoginActivity"
-            android:parentActivityName=".MainActivity" />
-        <activity android:name=".StatisticActivity" />
-        <activity android:name=".HistoryActivity" />
-        <activity android:name=".FriendsActivity" />
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".StatisticActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".HistoryActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".FriendsActivity"
+            android:screenOrientation="portrait"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/map_key" />
 
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -52,8 +52,6 @@ class RVAdapter extends RecyclerView.Adapter<RVAdapter.MyViewHolder> {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context,TrainingViewer.class);
-                intent.putExtra("date",date.get(position));
-                intent.putExtra("desc",description.get(position));
                 intent.putExtra("id",trainingID.get(position));
                 context.startActivity(intent);
             }

@@ -59,6 +59,8 @@ public class RegisterActivity extends AppCompatActivity {
 
                 boolean isUsernameCorrect = false;
                 boolean isPasswordCorrect = false;
+                boolean isPasswordTyped = false;
+
 
                 String name = editTextName.getText().toString();
                 String surname = editTextSurname.getText().toString();
@@ -76,6 +78,14 @@ public class RegisterActivity extends AppCompatActivity {
                             "The username is already taken", Toast.LENGTH_SHORT).show();
                 }
 
+                if(!userName.equals("")){
+                    isPasswordTyped=true;
+                }
+                else {
+                    Toast.makeText(RegisterActivity.this,
+                            "Type username", Toast.LENGTH_SHORT).show();
+                }
+
                 // check if passward was typed correctly
                 if (password.equals(repeatPassword)){
                     isPasswordCorrect=true;
@@ -85,7 +95,7 @@ public class RegisterActivity extends AppCompatActivity {
                 }
 
                 //create user
-                if(isPasswordCorrect && isUsernameCorrect){
+                if(isPasswordCorrect && isUsernameCorrect && isPasswordTyped){
                     SharedPreferences sharedPreferences = getSharedPreferences(
                             getResources().getString(R.string.SHARED_PREFS),MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -112,6 +122,9 @@ public class RegisterActivity extends AppCompatActivity {
                     editor.putInt("userId",dataBaseHalper.getUserID(userName));
                     editor.apply();
 
+                    // opening the statistics activity
+                    startActivity(new Intent(getApplicationContext(), StatisticActivity.class));
+                    overridePendingTransition(0,0);
                 }
 
             }

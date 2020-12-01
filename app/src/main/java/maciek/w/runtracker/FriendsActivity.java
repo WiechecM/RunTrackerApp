@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,6 +17,8 @@ public class FriendsActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNavigationView;
     private Toolbar toolbar;
+
+    private SharedPreferences sharedPreferences;
 
     @Override
     public void onBackPressed() {
@@ -61,15 +64,59 @@ public class FriendsActivity extends AppCompatActivity {
         });
     }
 
+    //options menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        sharedPreferences = getSharedPreferences(
+                getResources().getString(R.string.SHARED_PREFS),MODE_PRIVATE);
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_toolbar, menu);
+        // if id==1, no user is looged (default offline user)
+        if (sharedPreferences.getInt("userId",1)==1) {
+            inflater.inflate(R.menu.menu_toolbar,menu);
+        }
+        // if user is logged display second manu with logout
+        else{
+            inflater.inflate(R.menu.menu_toolbar_2,menu);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
+
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        return super.onOptionsItemSelected(item);
+        switch (item.getItemId()){
+            case R.id.log_in:
+                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                overridePendingTransition(0,0);
+                return true;
+
+            case R.id.settings:
+                startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
+                overridePendingTransition(0,0);
+                return true;
+
+            case R.id.sign_up:
+                startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
+                overridePendingTransition(0,0);
+                return true;
+
+            case R.id.log_out:
+                logOut();
+                return true;
+        }
+        return false;
+    }
+
+    private void logOut(){
+        sharedPreferences = getSharedPreferences(
+                getResources().getString(R.string.SHARED_PREFS),MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putInt("userId",1);
+        editor.apply();
+
+        //redraw the menu
+        this.invalidateOptionsMenu();
     }
 }

@@ -34,12 +34,14 @@ class DataBaseHalper extends SQLiteOpenHelper {
             "    id_user  INTEGER,\n" +
             "    tot_time REAL,\n" +
             "    tot_dist REAL,\n" +
-            "    d_dist   TEXT,\n" +
+            "    h_lat    TEXT,\n" +
+            "    h_lon    TEXT,\n" +
             "    d_vel    TEXT,\n" +
             "    d_pace   TEXT,\n" +
             "    av_vel   REAL,\n" +
             "    unit     TEXT,\n" +
-            "    date     TEXT\n" +
+            "    date     TEXT,\n" +
+            "    interv   INTEGER\n" +
             ");\n";
 
 
@@ -131,6 +133,18 @@ class DataBaseHalper extends SQLiteOpenHelper {
         if (db!=null && id>0){
             cursor=db.rawQuery(query,null);
 
+        }
+        return cursor;
+    }
+
+    public Cursor readTrainingDetails(int trainingId){
+        String query= "SELECT tot_time, tot_dist, h_lat, h_lon, d_vel, d_pace, av_vel, unit, date,interv " +
+                "FROM trainings where id = "+ trainingId;
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = null;
+
+        if(db!= null){
+            cursor=db.rawQuery(query,null);
         }
         return cursor;
     }

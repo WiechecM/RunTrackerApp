@@ -35,11 +35,9 @@ import com.google.android.libraries.maps.GoogleMap;
 import com.google.android.libraries.maps.OnMapReadyCallback;
 import com.google.android.libraries.maps.SupportMapFragment;
 import com.google.android.libraries.maps.model.LatLng;
-import com.google.android.libraries.maps.model.Polyline;
 import com.google.android.libraries.maps.model.PolylineOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -69,13 +67,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ArrayList<DeltaDTV> intervals = new ArrayList<DeltaDTV>();
     private ArrayList<Double> paceMetric = new ArrayList<Double>();
     private ArrayList<Double> paceImperial = new ArrayList<Double>();
+    private String histLat ="";
+    private String histLon ="";
 
-
+    private PolylineOptions polylineOptions;
 
     //double tap back button to exit the app
     boolean doubleBackToExitPressedOnce = false;
 
-   
+
     //closing the app after double click the back button
     @Override
     public void onBackPressed() {
@@ -99,10 +99,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //options menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        sharedPreferences = getSharedPreferences(
+                getResources().getString(R.string.SHARED_PREFS),MODE_PRIVATE);
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_toolbar,menu);
+        // if id==1, no user is looged (default offline user)
+        if (sharedPreferences.getInt("userId",1)==1) {
+            inflater.inflate(R.menu.menu_toolbar,menu);
+        }
+        // if user is logged display second manu with logout
+        else{
+            inflater.inflate(R.menu.menu_toolbar_2,menu);
+        }
         return super.onCreateOptionsMenu(menu);
     }
+
+
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -121,6 +132,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
                 overridePendingTransition(0,0);
                 return true;
+
+            case R.id.log_out:
+                logOut();
+                return true;
         }
         return false;
     }
@@ -130,16 +145,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //clear database for debug purpose
+//        // clear database for debug purpose
 //        DataBaseHalper dataBaseHalper = new DataBaseHalper(this);
 //        dataBaseHalper.clearDatabase();
 //
+//        // force appInit
 //        sharedPreferences = getSharedPreferences(
 //                getResources().getString(R.string.SHARED_PREFS),MODE_PRIVATE);
 //        SharedPreferences.Editor editor = sharedPreferences.edit();
 //        editor.putBoolean("firstStart",true);
 //        editor.apply();
-
 
 
         //initialization during first launch
@@ -194,6 +209,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        //line displayed on the mat options
+        polylineOptions = new PolylineOptions()
+                .width(7)
+                .color(Color.GREEN);
+
 
         // start button listener
         buttonStartStop.setOnClickListener(new View.OnClickListener() {
@@ -215,6 +235,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
 
+                latitude=roundVal(latitude,5);
+                longitude=roundVal(longitude,5);
+
 
                 // if started take current loc as STOP and calc dist
                 if (start) {
@@ -225,8 +248,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     buttonStartStop.setBackground(getDrawable(R.drawable.ic_play));
                     textViewVelLabel.setText("Avr Vel: ");
 
-                    totTime=  (SystemClock.elapsedRealtime()-chronometer.getBase())/1000.0;
-                    textViewVel.setText(String.valueOf(totDist/totTime));
+
+//                    totTime=  (SystemClock.elapsedRealtime()-chronometer.getBase())/1000.0;
+                    totTime=totTime-totTime%1;
+                    textViewVel.setText(String.valueOf(totDist/totTime*3.6));
 
                     chronometer.stop();
                     // enable the navigation bar
@@ -237,11 +262,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     //saving the training in the database
                     saveTraining();
 
+                    Log.i("LOG", histLat);
+                    Log.i("LOG", histLon);
+
                 } else { //is not started take current loc as START and start chronometer
 
 
                     prevLat = latitude;
                     prevLon = longitude;
+
+                    histLat =latitude+";";
+                    histLon =longitude+";";
+
+                    polylineOptions.add(new LatLng(latitude,longitude));
                     start = !start;
                     buttonStartStop.setBackground(getDrawable(R.drawable.ic_stop));
                     textViewVelLabel.setText("Cur Vel: ");
@@ -289,6 +322,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     double latitude = location.getLatitude();
                     double longitude = location.getLongitude();
 
+                    //rounding the coordinates to save memory
+                    latitude=roundVal(latitude,5);
+                    longitude=roundVal(longitude,5);
+
                     //calculate the distance and vel in this second
                     delta.setLoc(prevLat, prevLon, latitude, longitude);
 
@@ -297,9 +334,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     intervals.add(deltaDTV);
 
                     // draw a line on the map
-                    Polyline line = map.addPolyline(new PolylineOptions()
-                            .add(new LatLng(prevLat,prevLon), new LatLng(latitude, longitude))
-                            .width(5).color(Color.RED));
+//                    Polyline line = map.addPolyline(new PolylineOptions()
+//                            .add(new LatLng(prevLat,prevLon), new LatLng(latitude, longitude))
+//                            .width(5).color(Color.RED));
+
+                    map.clear();
+                    polylineOptions.add(new LatLng(latitude,longitude));
+                    map.addPolyline(polylineOptions);
+                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude),15));
 
 
                     //calculate the average velocity
@@ -311,22 +353,32 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         velocity = vel / intervals.size();
                     } else {
 
-                        Double vel = 0.0;
+                        double vel = 0.0;
                         for (int i = intervals.size() - 5; i < intervals.size() - 1; i++) {
                             vel = vel + intervals.get(i).getdDist();
                         }
                         velocity = vel / 5;
                     }
-                    textViewVel.setText(String.valueOf(velocity));
+                    textViewVel.setText(String.valueOf(velocity*3.6));
+
+                    totTime=totTime+1.0;
 
                     // update the total distance and check if it reached 100m interval
                     checkPace(deltaDTV);
                     totDist = totDist + delta.getDist();
-                    textViewDist.setText(String.valueOf(totDist));
+                    textViewDist.setText(String.valueOf(roundVal(totDist/1000.0,2)));
+
+
+                    double dlat =  latitude*100000-prevLat*100000;
+                    double dlon = longitude*100000-prevLon*100000;
+
+                    histLat = histLat +Math.round(dlat)+";";
+                    histLon = histLon +Math.round(dlon)+";";
 
                     // update previous coordinates
                     prevLat = latitude;
                     prevLon = longitude;
+
                 }
             }
         });
@@ -334,13 +386,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         update();
     }
 
+    private void logOut(){
+        sharedPreferences = getSharedPreferences(
+                getResources().getString(R.string.SHARED_PREFS),MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putInt("userId",1);
+        editor.apply();
+
+        //redraw the menu
+        this.invalidateOptionsMenu();
+    }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
 
-        LatLng Krakow = new LatLng(50.039269, 19.926125);
-
-        map.moveCamera(CameraUpdateFactory.newLatLng(Krakow));
+//        LatLng Krakow = new LatLng(50.039269, 19.926125);
+//
+//        map.moveCamera(CameraUpdateFactory.newLatLng(Krakow));
         enableMyLocation();
     }
 
@@ -373,9 +437,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public Boolean checkPace(DeltaDTV delta){
 
 
-        SharedPreferences sharedPreferences =getSharedPreferences(
+        sharedPreferences =getSharedPreferences(
                 getResources().getString(R.string.SHARED_PREFS),MODE_PRIVATE);
-        Boolean units = sharedPreferences.getBoolean("Units",false);
+        boolean units = sharedPreferences.getBoolean("Units",false);
 
 
         // if metric or imperial
@@ -388,10 +452,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             //metric
             // smallest step is 100m
 
-            Double totDistAfterStep = totDist + delta.getdDist();
+            double totDistAfterStep = totDist + delta.getdDist();
             int  intervNoBefore = (int) ((totDist - totDist % 100) / 100);
             int intervNoAfter = (int) ((totDistAfterStep - totDistAfterStep % 100) / 100);
-            Double time = (SystemClock.elapsedRealtime() - chronometer.getBase())/1000.0;
+            double time = (SystemClock.elapsedRealtime() - chronometer.getBase())/1000.0;
 
 
             //if distance didnt reach a new full interval
@@ -401,14 +465,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             //if distance reached a new full interval
             else {
                 //time from previous interval
-                Double division = (100.0 - totDist % 100) / delta.getdDist();
+                double division = (100.0 - totDist % 100) / delta.getdDist();
 
                 if (paceMetric.isEmpty()) {
                     time=time-1.0+1.0*division;
                     time=Math.round(time*10)/10.0;
                 } else {
-                    Double prevTime=0.0;
-                    for(Double T:paceMetric){
+                    double prevTime=0.0;
+                    for(double T:paceMetric){
                         prevTime=prevTime+T;
                     }
                     time=time-1.0+1.0*division-prevTime;
@@ -451,6 +515,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return false;
     }
 
+    public Double roundVal(Double val, int decimal){
+        double temp = Math.pow(10.0,decimal);
+        return Math.round(val*temp)/temp;
+    }
+
     public void update(){
 
         // creating the shared preferences editor
@@ -466,11 +535,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    Double roundValues(double val, int decimal) {
+        double temp = Math.pow(10.0,decimal);
+        return Math.round(val*temp)/temp;
+    }
+
+
     void saveTraining(){
 
-    DataBaseHalper dataBaseHalper = new DataBaseHalper(this);
+        DataBaseHalper dataBaseHalper = new DataBaseHalper(this);
 
-        SharedPreferences sharedPreferences = getSharedPreferences(
+        sharedPreferences = getSharedPreferences(
                 getResources().getString(R.string.SHARED_PREFS),MODE_PRIVATE);
 
         String unit ="";
@@ -483,13 +558,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         contentValues.put("id_user",sharedPreferences.getInt("userId",0));
         contentValues.put("tot_time",totTime);
         contentValues.put("tot_dist",totDist);
-        contentValues.put("d_dist",dDistToString());
+        //contentValues.put("d_dist",dDistToString());
+        contentValues.put("h_lat",histLat);
+        contentValues.put("h_lon",histLon);
         contentValues.put("d_vel",dVelToString());
         contentValues.put("d_pace",dPaceToString());
-        contentValues.put("av_vel",totDist/totTime);
+        contentValues.put("av_vel",totDist/totTime*3.6);
         contentValues.put("unit",unit);
         contentValues.put("date",dateToString());
-        
+        contentValues.put("interv",sharedPreferences.getInt("Intervals",3));
+
         dataBaseHalper.addTraining(contentValues);
         Toast.makeText(this, "Training saved", Toast.LENGTH_SHORT).show();
     }
@@ -511,7 +589,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     String dPaceToString(){
-        SharedPreferences sharedPreferences = getSharedPreferences(
+        sharedPreferences = getSharedPreferences(
                 getResources().getString(R.string.SHARED_PREFS),MODE_PRIVATE);
         String d_pace="";
 
@@ -543,7 +621,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     void appInit(){
-        SharedPreferences sharedPreferences = getSharedPreferences(
+        sharedPreferences = getSharedPreferences(
                 getResources().getString(R.string.SHARED_PREFS),MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
